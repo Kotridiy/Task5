@@ -1,6 +1,6 @@
 ﻿namespace Core
 {
-    public enum Sex
+    public enum Gender
     {
         Undetermined,
         Male,

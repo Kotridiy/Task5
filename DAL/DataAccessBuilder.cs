@@ -1,12 +1,11 @@
 ﻿using DAL.Interfaces;
-using DAL.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace DAL
 {
     public static class DataAccessBuilder
     {
-        public static IDataUnitOfWork CreateUnitOfWork(string info = "")
+        public static IUnitOfWork CreateUnitOfWork(string info = "")
         {
             var options = new DbContextOptionsBuilder<ApplicationContext>().UseSqlServer(info).Options;
 

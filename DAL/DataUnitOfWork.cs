@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace DAL
 {
-    class DataUnitOfWork : IDataUnitOfWork, IDisposable
+    public class DataUnitOfWork : IUnitOfWork
     {
         public IGenericRepository<Client> Clients
         {
@@ -14,7 +14,7 @@ namespace DAL
             {
                 if (_clients == null)
                 {
-                    _clients = new ClientRepository(Context, _locker);
+                    _clients = new GenericRepository<Client>(Context, _locker);
                 }
                 return _clients;
             }
@@ -27,7 +27,7 @@ namespace DAL
             {
                 if (_products == null)
                 {
-                    _products = new ProductRepository(Context, _locker);
+                    _products = new GenericRepository<Product>(Context, _locker);
                 }
                 return _products;
             }
@@ -40,7 +40,7 @@ namespace DAL
             {
                 if (_managers == null)
                 {
-                    _managers = new ManagerRepository(Context, _locker);
+                    _managers = new GenericRepository<Manager>(Context, _locker);
                 }
                 return _managers;
             }
@@ -53,7 +53,7 @@ namespace DAL
             {
                 if (_soldProducts == null)
                 {
-                    _soldProducts = new SoldProductRepository(Context, _locker);
+                    _soldProducts = new GenericRepository<SoldProduct>(Context, _locker);
                 }
                 return _soldProducts;
             }

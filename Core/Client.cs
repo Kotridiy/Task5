@@ -7,8 +7,8 @@ namespace Core
     public class Client
     {
         public int Id { get; set; }
-        public Name Name { get; set; }
-        public Sex Sex { get; set; }
+        public string Name { get; set; }
+        public Gender Gender { get; set; }
         public DateTime Birthday { get; set; }
         [NotMapped]
         public IEnumerable<SoldProduct> BoughtProducts { get; set; }
