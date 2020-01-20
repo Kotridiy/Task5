@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Core
+﻿namespace Core
 {
     internal class Product
     {

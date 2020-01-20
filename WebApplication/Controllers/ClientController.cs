@@ -26,19 +26,23 @@ namespace WebApplication.Controllers
             var clientDTOs = _service.GetAll();
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
             var model = mapperConfig.CreateMapper().Map<IEnumerable<ClientViewModel>>(clientDTOs);
-            return View();
+            return View(model);
         }
 
         // GET: Client/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            var clientDTO = _service.Get(id);
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
+            var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
+            return View(model);
         }
 
         // GET: Client/Create
         public ActionResult Create()
         {
-            return View();
+            var model = new ClientViewModel();
+            return View(model);
         }
 
         // POST: Client/Create
@@ -47,8 +51,9 @@ namespace WebApplication.Controllers
         {
             try
             {
-                // TODO: Add insert logic here
-
+                var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientViewModel, ClientDTO>());
+                var item = mapperConfig.CreateMapper().Map<ClientDTO>(collection);
+                _service.Add(item);
                 return RedirectToAction("Index");
             }
             catch
@@ -60,7 +65,10 @@ namespace WebApplication.Controllers
         // GET: Client/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            var clientDTO = _service.Get(id);
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
+            var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
+            return View(model);
         }
 
         // POST: Client/Edit/5
@@ -69,7 +77,9 @@ namespace WebApplication.Controllers
         {
             try
             {
-                // TODO: Add update logic here
+                var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientViewModel, ClientDTO>());
+                var item = mapperConfig.CreateMapper().Map<ClientDTO>(collection);
+                _service.Edit(id, item);
 
                 return RedirectToAction("Index");
             }
@@ -82,7 +92,10 @@ namespace WebApplication.Controllers
         // GET: Client/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var clientDTO = _service.Get(id);
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
+            var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
+            return View(model);
         }
 
         // POST: Client/Delete/5
@@ -91,7 +104,7 @@ namespace WebApplication.Controllers
         {
             try
             {
-                // TODO: Add delete logic here
+                _service.Delete(id);
 
                 return RedirectToAction("Index");
             }

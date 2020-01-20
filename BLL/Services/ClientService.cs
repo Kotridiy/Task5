@@ -22,7 +22,42 @@ namespace BLL.Services
             using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDTO>());
-                return mapConfig.CreateMapper().Map<IEnumerable<ClientDTO>>(unitOfWork.Clients.GetAll());
+                var items = unitOfWork.Clients.GetAll();
+                return mapConfig.CreateMapper().Map<IEnumerable<ClientDTO>>(items);
+            }
+        }
+
+        public ClientDTO Get(int id)
+        {
+            using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
+            {
+                var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDTO>());
+                var item = unitOfWork.Clients.Get(id);
+                return mapConfig.CreateMapper().Map<ClientDTO>(item);
+            }
+        }
+
+        public void Add(ClientDTO itemDTO)
+        {
+            using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
+            {
+                var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, Client>());
+                var item = mapConfig.CreateMapper().Map<Client>(itemDTO);
+                unitOfWork.Clients.Add(item);
+            }
+        }
+
+        public void Edit(int id, ClientDTO item)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Delete(int id)
+        {
+            using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
+            {
+                var item = unitOfWork.Clients.Get(id);
+                unitOfWork.Clients.Delete(item);
             }
         }
     }
