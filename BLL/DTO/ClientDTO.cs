@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Core;
+using System;
 
-namespace Core
+namespace BLL.DTO
 {
-    internal class Client
+    public class ClientDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

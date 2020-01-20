@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Core;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+using System.Web;
 
-namespace Core
+namespace WebApplication.Models
 {
-    internal class Client
+    public class ClientViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

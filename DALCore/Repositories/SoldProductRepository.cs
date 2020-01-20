@@ -1,4 +1,6 @@
-﻿using DAL.Interfaces;
+﻿using DAL.DataModels;
+using DAL.EntityFramework;
+using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -7,24 +9,24 @@ using System.Threading;
 
 namespace DAL.Repositories
 {
-    class GenericRepository<T> : IGenericRepository<T> where T : class
+    class SoldProductRepository : IGenericRepository<SoldProduct>
     {
         ApplicationContext Context { get; set; }
         ReaderWriterLockSlim _locker;
 
-        public GenericRepository(ApplicationContext context, ReaderWriterLockSlim locker)
+        public SoldProductRepository(ApplicationContext context, ReaderWriterLockSlim locker)
         {
             Context = context ?? throw new ArgumentNullException(nameof(context));
             _locker = locker;
         }
 
-        public IEnumerable<T> GetAll()
+        public IEnumerable<SoldProduct> GetAll()
         {
             _locker.EnterReadLock();
-            IEnumerable<T> models;
+            IEnumerable<SoldProduct> models;
             try
             {
-                models = Context.Clients.AsEnumerable();
+                models = Context.SoldProducts.AsEnumerable();
             }
             finally
             {
@@ -33,13 +35,13 @@ namespace DAL.Repositories
             return models;
         }
 
-        public T Get(int id)
+        public SoldProduct Get(int id)
         {
             _locker.EnterReadLock();
-            T model;
+            SoldProduct model;
             try
             {
-                model = Context.Find(typeof(T), id) as T;
+                model = Context.SoldProducts.Find(id);
             }
             finally
             {
@@ -48,17 +50,17 @@ namespace DAL.Repositories
             return model;
         }
 
-        public void Add(T entity)
+        public void Add(SoldProduct entity)
         {
             Context.Add(entity);
         }
 
-        public void Update(T entity)
+        public void Update(SoldProduct entity)
         {
             Context.Entry(entity).State = EntityState.Modified;
         }
 
-        public void Delete(T entity)
+        public void Delete(SoldProduct entity)
         {
             Context.Remove(entity);
         }

@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Core;
 
-namespace Core
+namespace BLL.DTO
 {
-    internal class Manager
+    public class ManagerDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

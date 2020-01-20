@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using Core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 
-namespace Core
+namespace WebApplication.Models
 {
-    internal class Manager
+    public class ManagerViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

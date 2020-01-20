@@ -1,9 +1,7 @@
-﻿using Core;
+﻿using DAL.DataModels;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
 
-namespace DAL
+namespace DAL.EntityFramework
 {
     public class ApplicationContext : DbContext
     {

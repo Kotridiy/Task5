@@ -1,9 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Core
+﻿namespace BLL.DTO
 {
-    internal class Product
+    public class ProductDTO
     {
         public int Id { get; set; }
         public string Name { get; set; }

@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Core
+namespace DAL.DataModels
 {
-    internal class SoldProduct
+    public class SoldProduct
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
