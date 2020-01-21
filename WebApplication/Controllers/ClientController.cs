@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using BLL.DTO;
+using BLL.Infrastructure;
 using BLL.Services;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+using System.Configuration;
 using System.Web.Mvc;
 using WebApplication.Models;
 
@@ -16,102 +15,153 @@ namespace WebApplication.Controllers
 
         public ClientController()
         {
-            string info = @"Data Source=(LocalDb)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\Web-data.mdf;Initial Catalog=aspnet-WebApplication-20200113062835;Integrated Security=True";
+            string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             _service = new ClientService(info);
         }
 
-        // GET: Client
         public ActionResult Index()
         {
-            var clientDTOs = _service.GetAll();
+            IEnumerable<ClientDTO> clientDTOs;
+            try
+            {
+                clientDTOs = _service.GetAll();
+            }
+            catch
+            {
+                return View("Error");
+            }
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
             var model = mapperConfig.CreateMapper().Map<IEnumerable<ClientViewModel>>(clientDTOs);
             return View(model);
         }
 
-        // GET: Client/Details/5
         public ActionResult Details(int id)
         {
-            var clientDTO = _service.Get(id);
+            ClientDTO clientDTO;
+            try
+            {
+                clientDTO = _service.Get(id);
+            }
+            catch (DALException)
+            {
+
+                throw;
+            }
+            catch
+            {
+                return View("Error");
+            }
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
             var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
             return View(model);
         }
 
-        // GET: Client/Create
         public ActionResult Create()
         {
             var model = new ClientViewModel();
             return View(model);
         }
 
-        // POST: Client/Create
         [HttpPost]
-        public ActionResult Create(FormCollection collection)
+        public ActionResult Create(ClientViewModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientViewModel, ClientDTO>());
+            var item = mapperConfig.CreateMapper().Map<ClientDTO>(model);
             try
             {
-                var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientViewModel, ClientDTO>());
-                var item = mapperConfig.CreateMapper().Map<ClientDTO>(collection);
                 _service.Add(item);
-                return RedirectToAction("Index");
+            }
+            catch (ValidationException)
+            {
+
+                throw;
             }
             catch
             {
-                return View();
+                return View("Error");
             }
+
+            return RedirectToAction("Index");
         }
 
-        // GET: Client/Edit/5
         public ActionResult Edit(int id)
         {
-            var clientDTO = _service.Get(id);
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
-            var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
-            return View(model);
-        }
-
-        // POST: Client/Edit/5
-        [HttpPost]
-        public ActionResult Edit(int id, FormCollection collection)
-        {
+            ClientDTO clientDTO;
             try
             {
-                var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientViewModel, ClientDTO>());
-                var item = mapperConfig.CreateMapper().Map<ClientDTO>(collection);
-                _service.Edit(id, item);
+                clientDTO = _service.Get(id);
+            }
+            catch (DALException)
+            {
 
-                return RedirectToAction("Index");
+                throw;
             }
             catch
             {
-                return View();
+                return View("Error");
             }
+
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
+            var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
+            return View(model);
         }
 
-        // GET: Client/Delete/5
-        public ActionResult Delete(int id)
+        [HttpPost]
+        public ActionResult Edit(int id, ClientViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientViewModel, ClientDTO>());
+            var item = mapperConfig.CreateMapper().Map<ClientDTO>(model);
+            try
+            {
+                _service.Edit(id, item);
+
+            }
+            catch (ValidationException)
+            {
+
+                throw;
+            }
+            catch
+            {
+                return View("Error");
+            }
+            return RedirectToAction("Index");
+        }
+
+/*        public ActionResult Delete(int id)
         {
             var clientDTO = _service.Get(id);
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, ClientViewModel>());
             var model = mapperConfig.CreateMapper().Map<ClientViewModel>(clientDTO);
             return View(model);
         }
-
-        // POST: Client/Delete/5
+*/
         [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
+        public ActionResult Delete(int id)
         {
             try
             {
                 _service.Delete(id);
+            }
+            catch (DALException)
+            {
 
-                return RedirectToAction("Index");
+                throw;
             }
             catch
             {
-                return View();
+                return View("Error");
             }
+            return RedirectToAction("Index");
         }
     }
 }

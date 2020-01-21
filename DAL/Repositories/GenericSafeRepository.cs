@@ -1,7 +1,6 @@
 ﻿using DAL.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -18,13 +17,13 @@ namespace DAL.Repositories
             _locker = locker;
         }
 
-        public IEnumerable<T> GetAll()
+        public IQueryable<T> GetAll()
         {
             _locker.EnterReadLock();
-            IEnumerable<T> models;
+            IQueryable<T> models;
             try
             {
-                models = Context.Set<T>().AsEnumerable();
+                models = Context.Set<T>().AsQueryable();
             }
             finally
             {
