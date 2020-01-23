@@ -1,8 +1,9 @@
 ﻿using Core;
+using DAL.Interfaces;
 
 namespace DAL.DataModels
 {
-    public class Manager
+    public class Manager : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

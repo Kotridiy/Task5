@@ -1,8 +1,9 @@
-﻿using System;
+﻿using DAL.Interfaces;
+using System;
 
 namespace DAL.DataModels
 {
-    public class SoldProduct
+    public class SoldProduct : IEntity
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }

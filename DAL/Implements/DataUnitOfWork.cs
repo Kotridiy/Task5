@@ -4,7 +4,7 @@ using DAL.Interfaces;
 using DAL.Repositories;
 using System.Threading;
 
-namespace DAL
+namespace DAL.Implements
 {
     public class DataUnitOfWork : IUnitOfWork
     {
@@ -75,7 +75,19 @@ namespace DAL
 
         public void SaveChanges()
         {
-            _locker.EnterReadLock();
+            using (var transaction = Context.Database.BeginTransaction())
+            {
+                try
+                {
+                    Context.SaveChanges();
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Rollback();
+                }
+            }
+            /*_locker.EnterReadLock();
             try
             {
                 Context.SaveChanges();
@@ -83,7 +95,7 @@ namespace DAL
             finally
             {
                 _locker.ExitWriteLock();
-            }
+            }*/
         }
 
         public void Dispose()

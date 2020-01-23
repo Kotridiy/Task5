@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using BLL.DTO;
+using BLL.Interfaces;
 using DAL;
 using DAL.DataModels;
-using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace BLL.Services
 {
-    public class ClientService
+    public class ClientService : IGeneralService<ClientDTO>
     {
         string _connectionInfo;
 
@@ -44,12 +43,19 @@ namespace BLL.Services
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, Client>());
                 var item = mapConfig.CreateMapper().Map<Client>(itemDTO);
                 unitOfWork.Clients.Add(item);
+                unitOfWork.SaveChanges();
             }
         }
 
         public void Edit(int id, ClientDTO item)
         {
-            throw new NotImplementedException();
+            using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
+            {
+                var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, Client>());
+                var entity = unitOfWork.Clients.Get(id);
+                unitOfWork.Clients.Update(mapConfig.CreateMapper().Map(item, entity));
+                unitOfWork.SaveChanges();
+            }
         }
 
         public void Delete(int id)
@@ -58,6 +64,7 @@ namespace BLL.Services
             {
                 var item = unitOfWork.Clients.Get(id);
                 unitOfWork.Clients.Delete(item);
+                unitOfWork.SaveChanges();
             }
         }
     }

@@ -1,9 +1,10 @@
 ﻿using Core;
+using DAL.Interfaces;
 using System;
 
 namespace DAL.DataModels
 {
-    public class Client
+    public class Client : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }

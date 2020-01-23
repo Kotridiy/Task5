@@ -1,6 +1,8 @@
-﻿namespace DAL.DataModels
+﻿using DAL.Interfaces;
+
+namespace DAL.DataModels
 {
-    public class Product
+    public class Product : IEntity
     {
         public int Id { get; set; }
         public string Name { get; set; }
