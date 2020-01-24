@@ -52,6 +52,7 @@
     <Compile Include="Infrastructure\ValidationException.cs" />
     <Compile Include="Interfaces\IGeneralService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\SoldProductService.cs" />
     <Compile Include="Services\ProductService.cs" />
     <Compile Include="Services\ManagerService.cs" />
     <Compile Include="Services\ClientService.cs" />

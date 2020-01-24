@@ -14,5 +14,8 @@ namespace WebApplication.Models
         public ClientDTO Client { get; set; }
         public ManagerDTO Manager { get; set; }
         public ProductDTO Product { get; set; }
+
+        public int ClientId { get; set; }
+        public int ProductId { get; set; }
     }
 }

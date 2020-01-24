@@ -16,9 +16,9 @@ namespace WebApplication.Controllers
         public virtual ActionResult Index()
         {
             IEnumerable<TModelDTO> clientDTOs;
-            clientDTOs = _service.GetAll();
             try
             {
+                clientDTOs = _service.GetAll();
             }
             catch
             {
