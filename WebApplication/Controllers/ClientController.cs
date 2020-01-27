@@ -1,8 +1,5 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Infrastructure;
+﻿using BLL.DTO;
 using BLL.Services;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Web.Mvc;
 using WebApplication.Models;
@@ -15,6 +12,18 @@ namespace WebApplication.Controllers
         {
             string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
             _service = new ClientService(info);
+        }
+
+        [Authorize(Roles = "User")]
+        public override ActionResult Create()
+        {
+            return base.Create();
+        }
+
+        [Authorize(Roles = "User")]
+        public override ActionResult Create(ClientViewModel model)
+        {
+            return base.Create(model);
         }
     }
 }

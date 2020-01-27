@@ -198,7 +198,7 @@
     <Compile Include="Models\ManagerViewModel.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ProductViewModel.cs" />
-    <Compile Include="Models\SoldProductViewModel.cs" />
+    <Compile Include="Models\SoldProductViewModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -271,6 +271,7 @@
     <Content Include="Views\SoldProduct\Index.cshtml" />
     <Content Include="Views\SoldProduct\Details.cshtml" />
     <Content Include="Views\SoldProduct\MakeOrder.cshtml" />
+    <Content Include="Views\Account\EditRole.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace WebApplication.Controllers
 {
+    [Authorize]
     public abstract class GeneralDataController<TService, TModelDTO, TViewModel> : Controller
         where TService : IGeneralService<TModelDTO>
         where TModelDTO : class, new()
@@ -29,33 +30,14 @@ namespace WebApplication.Controllers
             return View(model);
         }
 
-        /*public virtual ActionResult Details(int id)
-        {
-            TModelDTO clientDTO;
-            try
-            {
-                clientDTO = _service.Get(id);
-            }
-            catch (DALException)
-            {
-
-                throw;
-            }
-            catch
-            {
-                return View("Error");
-            }
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<TModelDTO, TViewModel>());
-            var model = mapperConfig.CreateMapper().Map<TViewModel>(clientDTO);
-            return View(model);
-        }*/
-
+        [Authorize(Roles = "Admin")]
         public virtual ActionResult Create()
         {
             var model = new TViewModel();
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public virtual ActionResult Create(TViewModel model)
         {
@@ -83,6 +65,7 @@ namespace WebApplication.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
         public virtual ActionResult Edit(int id)
         {
             TModelDTO clientDTO;
@@ -105,6 +88,7 @@ namespace WebApplication.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public virtual ActionResult Edit(int id, TViewModel model)
         {
@@ -131,6 +115,8 @@ namespace WebApplication.Controllers
             return RedirectToAction("Index");
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPost]
         public virtual ActionResult Delete(int id)
         {
             try
@@ -146,7 +132,7 @@ namespace WebApplication.Controllers
             {
                 return View("Error");
             }
-            return RedirectToAction("Index");
+            return null;
         }
     }
 }

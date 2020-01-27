@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using WebApplication.Models;
@@ -49,6 +50,41 @@ namespace WebApplication.Controllers
             private set
             {
                 _userManager = value;
+            }
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult EditRole()
+        {
+            var context = new ApplicationDbContext();
+            var userStore = new UserStore<ApplicationUser>(context);
+            var userManager = new UserManager<ApplicationUser>(userStore);
+            var users = userManager.Users;
+            var userList = new SelectList(users, nameof(ApplicationUser.Id), nameof(ApplicationUser.UserName));
+            ViewBag.Users = userList;
+
+            var roleStore = new RoleStore<IdentityRole>(context);
+            var roleManager = new RoleManager<IdentityRole>(roleStore);
+            var roles = roleManager.Roles;
+            var roleList = new SelectList(roles, nameof(IdentityRole.Name), nameof(IdentityRole.Name));
+            ViewBag.Roles = roleList;
+
+            var editRoleModel = new EditRoleViewModel();
+            return View(editRoleModel);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public ActionResult EditRole(EditRoleViewModel model)
+        {
+            if (UserManager.RemoveFromRoles(model.UserId, UserManager.GetRoles(model.UserId).ToArray()).Succeeded &&
+                UserManager.AddToRole(model.UserId, model.Role).Succeeded)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View("Error");
             }
         }
 
@@ -152,8 +188,9 @@ namespace WebApplication.Controllers
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-                var result = await UserManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
+                var result1 = await UserManager.CreateAsync(user, model.Password);
+                var result2 = await UserManager.AddToRoleAsync(user.Id, "User");
+                if (result1.Succeeded && result2.Succeeded)
                 {
                     await SignInManager.SignInAsync(user, isPersistent:false, rememberBrowser:false);
                     
@@ -165,7 +202,8 @@ namespace WebApplication.Controllers
 
                     return RedirectToAction("Index", "Home");
                 }
-                AddErrors(result);
+                AddErrors(result1);
+                AddErrors(result2);
             }
 
             // If we got this far, something failed, redisplay form

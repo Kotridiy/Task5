@@ -109,4 +109,13 @@ namespace WebApplication.Models
         [Display(Name = "Email")]
         public string Email { get; set; }
     }
+
+    public class EditRoleViewModel
+    {
+        [Required]
+        [Display(Name = "User")]
+        public string UserId { get; set; }
+        [Required]
+        public string Role { get; set; }
+    }
 }
