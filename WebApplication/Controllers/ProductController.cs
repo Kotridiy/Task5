@@ -10,16 +10,25 @@ namespace WebApplication.Controllers
 {
     public class ProductController : GeneralDataController<ProductService, ProductDTO, ProductViewModel>
     {
-        public ProductController()
+        private ProductService _service;
+        protected override ProductService Service
         {
-            string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-            _service = new ProductService(info);
+            get
+            {
+                if (_service == null)
+                {
+                    string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                    _service = new ProductService(info);
+                }
+                return _service;
+            }
+            set => _service = value;
         }
 
         [AllowAnonymous]
         public JsonResult JsonProductCount()
         {
-            var productCounts = _service.GetAll().Select(item => new ArrayList() { item.Name, item.Count });
+            var productCounts = Service.GetAll().Select(item => new ArrayList() { item.Name, item.Count });
             return Json(productCounts);
         }
     }

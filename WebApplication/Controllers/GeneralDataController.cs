@@ -12,14 +12,14 @@ namespace WebApplication.Controllers
         where TModelDTO : class, new()
         where TViewModel : class, new()
     {
-        protected TService _service;
+        protected abstract TService Service { get; set; }
 
         public virtual ActionResult Index()
         {
             IEnumerable<TModelDTO> clientDTOs;
             try
             {
-                clientDTOs = _service.GetAll();
+                clientDTOs = Service.GetAll();
             }
             catch
             {
@@ -50,7 +50,7 @@ namespace WebApplication.Controllers
             var item = mapperConfig.CreateMapper().Map<TModelDTO>(model);
             try
             {
-                _service.Add(item);
+                Service.Add(item);
             }
             catch (ValidationException)
             {
@@ -71,9 +71,9 @@ namespace WebApplication.Controllers
             TModelDTO clientDTO;
             try
             {
-                clientDTO = _service.Get(id);
+                clientDTO = Service.Get(id);
             }
-            catch (DALException)
+            catch (DatabaseException)
             {
 
                 throw;
@@ -100,7 +100,7 @@ namespace WebApplication.Controllers
             var item = mapperConfig.CreateMapper().Map<TModelDTO>(model);
             try
             {
-                _service.Edit(id, item);
+                Service.Edit(id, item);
 
             }
             catch (ValidationException)
@@ -121,9 +121,9 @@ namespace WebApplication.Controllers
         {
             try
             {
-                _service.Delete(id);
+                Service.Delete(id);
             }
-            catch (DALException)
+            catch (DatabaseException)
             {
 
                 throw;

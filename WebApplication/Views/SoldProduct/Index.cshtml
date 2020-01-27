@@ -1,4 +1,4 @@
-﻿@model IEnumerable<WebApplication.Models.SoldProductViewModel>
+﻿@model IEnumerable<WebApplication.Models.DetailSoldProductViewModel>
 
 @{
     ViewBag.Title = "Check out";
@@ -7,43 +7,72 @@
 <p>
     @Html.ActionLink("Make new order", "MakeOrder")
 </p>
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Client)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Manager)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Product)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Date)
-        </th>
-        <th></th>
-    </tr>
 
-    @foreach (var item in Model)
-    {
+<div>
+    <form id="searchform">
+    <div>
+        <p>Price: </p>
+        <input type="text" name="price" />
+    </div>
+    <input type="submit" id="searchsubmit" value="Search" />
+    </form>
+</div>
+
+<div id="result">
+    <table class="table">
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Client.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Manager.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.ActionLink("Details", "Details", new { id = item.Id })
-            </td>
+            <th>
+                @Html.DisplayNameFor(model => model.Client)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Manager)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Product)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th></th>
         </tr>
-    }
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Manager.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Product.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+            </tr>
+        }
 
 
-</table>
+    </table>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/Scripts/jquery-3.4.1.js");
+    <script type="text/javascript">
+        $(document).ready(function () {
+            Search = function () {
+                $("#searchform").on("submit", function (e) {
+                    e.preventDefault();
+                    let obj = this;
+                    $.post('@Url.Action("ProductSearch")?price=' + $("[name=price]").val(), $("#searchform").serialize(), function (data) {
+                        $("#result").html(data);
+                    });
+                });
+            }
+
+            Search();
+        });
+    </script>
+}

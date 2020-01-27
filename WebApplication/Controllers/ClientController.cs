@@ -8,10 +8,19 @@ namespace WebApplication.Controllers
 {
     public class ClientController : GeneralDataController<ClientService, ClientDTO, ClientViewModel>
     {
-        public ClientController()
+        private ClientService _service;
+        protected override ClientService Service 
         {
-            string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-            _service = new ClientService(info);
+            get
+            {
+                if (_service == null)
+                {
+                    string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                    _service = new ClientService(info);
+                }
+                return _service;
+            }
+            set => _service = value; 
         }
 
         [Authorize(Roles = "User")]

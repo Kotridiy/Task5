@@ -14,54 +14,45 @@ namespace WebApplication.Controllers
     public class SoldProductController : Controller
     {
         private SoldProductService _service;
+        private SoldProductService Service
+        {
+            get
+            {
+                if (_service == null)
+                {
+                    string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                    _service = new SoldProductService(info);
+                }
+                return _service;
+            }
+            set => _service = value;
+        }
 
         public SoldProductController()
         {
             string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-            _service = new SoldProductService(info);
+            Service = new SoldProductService(info);
         }
 
         public ActionResult Index()
         {
-            IEnumerable<SoldProductDTO> clientDTOs;
+            IEnumerable<SoldProductDTO> productDTOs;
             try
             {
-                clientDTOs = _service.GetAll();
+                productDTOs = Service.GetAll();
             }
-            catch (DALException)
+            catch (DatabaseException)
             {
                 return View("Error");
             }
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<SoldProductDTO, CreateSoldProductViewModel>());
-            var model = mapperConfig.CreateMapper().Map<IEnumerable<CreateSoldProductViewModel>>(clientDTOs);
-            return View(model);
-        }
-
-
-        public ActionResult Details(int id)
-        {
-            SoldProductDTO clientDTO;
-            try
-            {
-                clientDTO = _service.Get(id);
-            }
-            catch (DALException)
-            {
-
-                throw;
-            }
-            catch
-            {
-                return View("Error");
-            }
-            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<SoldProductDTO, CreateSoldProductViewModel>());
-            var model = mapperConfig.CreateMapper().Map<CreateSoldProductViewModel>(clientDTO);
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<SoldProductDTO, DetailSoldProductViewModel>());
+            var model = mapperConfig.CreateMapper().Map<IEnumerable<DetailSoldProductViewModel>>(productDTOs);
             return View(model);
         }
 
         public ActionResult MakeOrder()
         {
-            (var clients, var products) = _service.GetData();
+            (var clients, var products) = Service.GetData();
             SelectList clientList = new SelectList(clients, nameof(ClientDTO.Id), nameof(ClientDTO.Name));
             SelectList productList = new SelectList(products, nameof(ProductDTO.Id), nameof(ProductDTO.Name));
             ViewBag.Clients = clientList;
@@ -80,9 +71,9 @@ namespace WebApplication.Controllers
 
             var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<CreateSoldProductViewModel, SoldProductDTO>());
             var item = mapperConfig.CreateMapper().Map<SoldProductDTO>(model);
+                Service.Add(item, model.ClientId, model.ProductId);
             try
             {
-                _service.Add(item, model.ClientId, model.ProductId);
             }
             catch (ValidationException)
             {
@@ -96,6 +87,23 @@ namespace WebApplication.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult ProductSearch(string price)
+        {
+            IEnumerable<SoldProductDTO> productDTOs;
+            try
+            {
+                productDTOs = Service.Search(int.Parse(price));
+            }
+            catch (DatabaseException)
+            {
+                return View("Error");
+            }
+            var mapperConfig = new MapperConfiguration(cfg => cfg.CreateMap<SoldProductDTO, DetailSoldProductViewModel>());
+            var model = mapperConfig.CreateMapper().Map<IEnumerable<DetailSoldProductViewModel>>(productDTOs);
+            return PartialView(model);
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using AutoMapper;
 using BLL.DTO;
-using BLL.Interfaces;
+using BLL.Infrastructure;
 using DAL;
 using DAL.DataModels;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BLL.Services
 {
     public class SoldProductService
     {
-        string _connectionInfo;
+        public string _connectionInfo;
 
         public SoldProductService(string connectionInfo)
         {
@@ -29,7 +30,15 @@ namespace BLL.Services
                         cfg.CreateMap<Manager, ManagerDTO>();
                     });
                 var items = unitOfWork.SoldProducts.GetAll();
-                return mapConfig.CreateMapper().Map<IEnumerable<SoldProductDTO>>(items);
+                try
+                {
+                    return mapConfig.CreateMapper().Map<IEnumerable<SoldProductDTO>>(items);
+                }
+                catch
+                {
+
+                    throw new DatabaseException();
+                }
             }
         }
 
@@ -38,7 +47,15 @@ namespace BLL.Services
             using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<SoldProduct, SoldProductDTO>());
-                var item = unitOfWork.SoldProducts.Get(id);
+                SoldProduct item;
+                try
+                {
+                    item = unitOfWork.SoldProducts.Get(id);
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
                 return mapConfig.CreateMapper().Map<SoldProductDTO>(item);
             }
         }
@@ -49,9 +66,30 @@ namespace BLL.Services
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<SoldProductDTO, SoldProduct>());
                 var item = mapConfig.CreateMapper().Map<SoldProduct>(itemDTO);
-                item.Client = unitOfWork.Clients.Get(clientId);
-                item.Product = unitOfWork.Products.Get(productId);
-                item.Manager = unitOfWork.Managers.Get(1);
+
+                Product product;
+                try
+                {
+                    item.Client = unitOfWork.Clients.Get(clientId);
+                    item.Manager = unitOfWork.Managers.Get(1);
+                    product = unitOfWork.Products.Get(productId);
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
+
+                if (product.Count == 0)
+                {
+                    throw new ValidationException("This product sold out!");
+                }
+                else
+                {
+                    product.Count--;
+                    unitOfWork.Products.Update(product);
+                    item.Product = product;
+                }
+
                 unitOfWork.SoldProducts.Add(item);
                 unitOfWork.SaveChanges();
             }
@@ -62,13 +100,48 @@ namespace BLL.Services
             using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
             {
                 var clientMapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDTO>());
-                var clients = unitOfWork.Clients.GetAll();
-                var clientDtos = clientMapConfig.CreateMapper().Map<IEnumerable<ClientDTO>>(clients);
                 var productMapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Product, ProductDTO>());
+                var clients = unitOfWork.Clients.GetAll();
                 var products = unitOfWork.Products.GetAll();
-                var productDtos = productMapConfig.CreateMapper().Map<IEnumerable<ProductDTO>>(products);
+                IEnumerable<ClientDTO> clientDtos;
+                IEnumerable<ProductDTO> productDtos;
+                try
+                {
+                    clientDtos = clientMapConfig.CreateMapper().Map<IEnumerable<ClientDTO>>(clients);
+                    productDtos = productMapConfig.CreateMapper().Map<IEnumerable<ProductDTO>>(products);
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
 
                 return (clientDtos, productDtos);
+            }
+        }
+
+        public IEnumerable<SoldProductDTO> Search(int price)
+        {
+            using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
+            {
+                var mapConfig = new MapperConfiguration(
+                    cfg =>
+                    {
+                        cfg.CreateMap<SoldProduct, SoldProductDTO>();
+                        cfg.CreateMap<Product, ProductDTO>();
+                        cfg.CreateMap<Client, ClientDTO>();
+                        cfg.CreateMap<Manager, ManagerDTO>();
+                    });
+                var items = unitOfWork.SoldProducts.GetAll();
+                items = items.Where(i => i.Product.Price > price);
+                try
+                {
+                    return mapConfig.CreateMapper().Map<IEnumerable<SoldProductDTO>>(items);
+                }
+                catch
+                {
+
+                    throw new DatabaseException();
+                }
             }
         }
     }

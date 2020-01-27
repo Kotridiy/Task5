@@ -8,6 +8,14 @@ namespace DAL.Implements
 {
     public class MockUnitOfWork : IUnitOfWork
     {
+        private IGenericRepository<Client> _clients;
+        private IGenericRepository<Product> _products;
+        private IGenericRepository<Manager> _managers;
+        private IGenericRepository<SoldProduct> _soldProducts;
+        private static bool _isClientCreated; 
+        private static bool _isProductCreated; 
+        private static bool _isManagerCreated; 
+        
         public IGenericRepository<Client> Clients
         {
             get
@@ -80,14 +88,6 @@ namespace DAL.Implements
             }
             set => _soldProducts = value;
         }
-
-        private IGenericRepository<Client> _clients;
-        private IGenericRepository<Product> _products;
-        private IGenericRepository<Manager> _managers;
-        private IGenericRepository<SoldProduct> _soldProducts;
-        private static bool _isClientCreated; 
-        private static bool _isProductCreated; 
-        private static bool _isManagerCreated; 
 
         public void Dispose() { }
         public void SaveChanges() { }

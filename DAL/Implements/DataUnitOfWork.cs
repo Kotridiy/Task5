@@ -8,13 +8,18 @@ namespace DAL.Implements
 {
     public class DataUnitOfWork : IUnitOfWork
     {
+        private IGenericRepository<Client> _clients;
+        private IGenericRepository<Product> _products;
+        private IGenericRepository<Manager> _managers;
+        private IGenericRepository<SoldProduct> _soldProducts;
+
         public IGenericRepository<Client> Clients
         {
             get
             {
                 if (_clients == null)
                 {
-                    _clients = new GenericSafeRepository<Client>(Context, _locker);
+                    _clients = new GenericRepository<Client>(Context);
                 }
                 return _clients;
             }
@@ -27,7 +32,7 @@ namespace DAL.Implements
             {
                 if (_products == null)
                 {
-                    _products = new GenericSafeRepository<Product>(Context, _locker);
+                    _products = new GenericRepository<Product>(Context);
                 }
                 return _products;
             }
@@ -40,7 +45,7 @@ namespace DAL.Implements
             {
                 if (_managers == null)
                 {
-                    _managers = new GenericSafeRepository<Manager>(Context, _locker);
+                    _managers = new GenericRepository<Manager>(Context);
                 }
                 return _managers;
             }
@@ -53,7 +58,7 @@ namespace DAL.Implements
             {
                 if (_soldProducts == null)
                 {
-                    _soldProducts = new GenericSafeRepository<SoldProduct>(Context, _locker);
+                    _soldProducts = new GenericRepository<SoldProduct>(Context);
                 }
                 return _soldProducts;
             }
@@ -61,41 +66,15 @@ namespace DAL.Implements
         }
 
         ApplicationContext Context { get; set; }
-        ReaderWriterLockSlim _locker;
-        private IGenericRepository<Client> _clients;
-        private IGenericRepository<Product> _products;
-        private IGenericRepository<Manager> _managers;
-        private IGenericRepository<SoldProduct> _soldProducts;
 
-        public DataUnitOfWork(ApplicationContext context, ReaderWriterLockSlim locker = null)
+        public DataUnitOfWork(ApplicationContext context)
         {
             Context = context;
-            _locker = locker ?? new ReaderWriterLockSlim();
         }
 
         public void SaveChanges()
         {
-            using (var transaction = Context.Database.BeginTransaction())
-            {
-                try
-                {
-                    Context.SaveChanges();
-                    transaction.Commit();
-                }
-                catch
-                {
-                    transaction.Rollback();
-                }
-            }
-            /*_locker.EnterReadLock();
-            try
-            {
-                Context.SaveChanges();
-            }
-            finally
-            {
-                _locker.ExitWriteLock();
-            }*/
+            Context.SaveChanges();
         }
 
         public void Dispose()

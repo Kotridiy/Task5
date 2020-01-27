@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BLL.DTO;
+using BLL.Infrastructure;
 using BLL.Interfaces;
 using DAL;
 using DAL.DataModels;
@@ -9,7 +10,7 @@ namespace BLL.Services
 {
     public class ProductService : IGeneralService<ProductDTO>
     {
-        string _connectionInfo;
+        public string _connectionInfo;
 
         public ProductService(string connectionInfo)
         {
@@ -22,7 +23,17 @@ namespace BLL.Services
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Product, ProductDTO>());
                 var items = unitOfWork.Products.GetAll();
-                return mapConfig.CreateMapper().Map<IEnumerable<ProductDTO>>(items);
+                IEnumerable<ProductDTO> dtos;
+                try
+                {
+                    dtos = mapConfig.CreateMapper().Map<IEnumerable<ProductDTO>>(items);
+
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
+                return dtos;
             }
         }
 
@@ -32,7 +43,16 @@ namespace BLL.Services
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Product, ProductDTO>());
                 var item = unitOfWork.Products.Get(id);
-                return mapConfig.CreateMapper().Map<ProductDTO>(item);
+                ProductDTO itemDto;
+                try
+                {
+                    itemDto = mapConfig.CreateMapper().Map<ProductDTO>(item);
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
+                return itemDto;
             }
         }
 
@@ -43,7 +63,14 @@ namespace BLL.Services
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ProductDTO, Product>());
                 var item = mapConfig.CreateMapper().Map<Product>(itemDTO);
                 unitOfWork.Products.Add(item);
-                unitOfWork.SaveChanges();
+                try
+                {
+                    unitOfWork.SaveChanges();
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
             }
         }
 
@@ -54,7 +81,14 @@ namespace BLL.Services
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ProductDTO, Product>());
                 var entity = unitOfWork.Products.Get(id);
                 unitOfWork.Products.Update(mapConfig.CreateMapper().Map(item, entity));
-                unitOfWork.SaveChanges();
+                try
+                {
+                    unitOfWork.SaveChanges();
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
             }
         }
 
@@ -64,7 +98,14 @@ namespace BLL.Services
             {
                 var item = unitOfWork.Products.Get(id);
                 unitOfWork.Products.Delete(item);
-                unitOfWork.SaveChanges();
+                try
+                {
+                    unitOfWork.SaveChanges();
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
             }
         }
     }

@@ -269,9 +269,9 @@
     <Content Include="Views\Manager\Edit.cshtml" />
     <Content Include="Views\Manager\Create.cshtml" />
     <Content Include="Views\SoldProduct\Index.cshtml" />
-    <Content Include="Views\SoldProduct\Details.cshtml" />
     <Content Include="Views\SoldProduct\MakeOrder.cshtml" />
     <Content Include="Views\Account\EditRole.cshtml" />
+    <Content Include="Views\SoldProduct\ProductSearch.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -7,10 +7,19 @@ namespace WebApplication.Controllers
 {
     public class ManagerController : GeneralDataController<ManagerService, ManagerDTO, ManagerViewModel>
     {
-        public ManagerController()
+        private ManagerService _service;
+        protected override ManagerService Service
         {
-            string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-            _service = new ManagerService(info);
+            get
+            {
+                if (_service == null)
+                {
+                    string info = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
+                    _service = new ManagerService(info);
+                }
+                return _service;
+            }
+            set => _service = value;
         }
     }
 }

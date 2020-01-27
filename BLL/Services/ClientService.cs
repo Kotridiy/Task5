@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BLL.DTO;
+using BLL.Infrastructure;
 using BLL.Interfaces;
 using DAL;
 using DAL.DataModels;
@@ -9,7 +10,7 @@ namespace BLL.Services
 {
     public class ClientService : IGeneralService<ClientDTO>
     {
-        string _connectionInfo;
+        private string _connectionInfo;
 
         public ClientService(string connectionInfo)
         {
@@ -22,7 +23,17 @@ namespace BLL.Services
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDTO>());
                 var items = unitOfWork.Clients.GetAll();
-                return mapConfig.CreateMapper().Map<IEnumerable<ClientDTO>>(items);
+                IEnumerable<ClientDTO> dtos;
+                try
+                {
+                    dtos = mapConfig.CreateMapper().Map<IEnumerable<ClientDTO>>(items);
+
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
+                return dtos;
             }
         }
 
@@ -32,7 +43,16 @@ namespace BLL.Services
             {
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<Client, ClientDTO>());
                 var item = unitOfWork.Clients.Get(id);
-                return mapConfig.CreateMapper().Map<ClientDTO>(item);
+                ClientDTO itemDto;
+                try
+                {
+                    itemDto = mapConfig.CreateMapper().Map<ClientDTO>(item);
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
+                return itemDto;
             }
         }
 
@@ -43,7 +63,14 @@ namespace BLL.Services
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, Client>());
                 var item = mapConfig.CreateMapper().Map<Client>(itemDTO);
                 unitOfWork.Clients.Add(item);
-                unitOfWork.SaveChanges();
+                try
+                {
+                    unitOfWork.SaveChanges();
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
             }
         }
 
@@ -54,7 +81,14 @@ namespace BLL.Services
                 var mapConfig = new MapperConfiguration(cfg => cfg.CreateMap<ClientDTO, Client>());
                 var entity = unitOfWork.Clients.Get(id);
                 unitOfWork.Clients.Update(mapConfig.CreateMapper().Map(item, entity));
-                unitOfWork.SaveChanges();
+                try
+                {
+                    unitOfWork.SaveChanges();
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
             }
         }
 
@@ -64,7 +98,14 @@ namespace BLL.Services
             {
                 var item = unitOfWork.Clients.Get(id);
                 unitOfWork.Clients.Delete(item);
-                unitOfWork.SaveChanges();
+                try
+                {
+                    unitOfWork.SaveChanges();
+                }
+                catch
+                {
+                    throw new DatabaseException();
+                }
             }
         }
     }
