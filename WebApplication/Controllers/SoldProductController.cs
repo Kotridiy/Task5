@@ -90,12 +90,12 @@ namespace WebApplication.Controllers
         }
 
         [HttpPost]
-        public ActionResult ProductSearch(string price)
+        public ActionResult ProductSearch()
         {
             IEnumerable<SoldProductDTO> productDTOs;
             try
             {
-                productDTOs = Service.Search(int.Parse(price));
+                productDTOs = Service.Search(Request.Form["price"], Request.Form["manager"], Request.Form["client"], Request.Form["or_and"]);
             }
             catch (DatabaseException)
             {

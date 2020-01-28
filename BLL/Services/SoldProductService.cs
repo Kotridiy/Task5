@@ -3,8 +3,10 @@ using BLL.DTO;
 using BLL.Infrastructure;
 using DAL;
 using DAL.DataModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace BLL.Services
 {
@@ -119,7 +121,7 @@ namespace BLL.Services
             }
         }
 
-        public IEnumerable<SoldProductDTO> Search(int price)
+        public IEnumerable<SoldProductDTO> Search(string priceStr, string manager, string client, string mode)
         {
             using (var unitOfWork = DataAccessBuilder.CreateUnitOfWork(_connectionInfo))
             {
@@ -132,17 +134,51 @@ namespace BLL.Services
                         cfg.CreateMap<Manager, ManagerDTO>();
                     });
                 var items = unitOfWork.SoldProducts.GetAll();
-                items = items.Where(i => i.Product.Price > price);
+                decimal price;
+                try
+                {
+                    price = priceStr != "" ? decimal.Parse(priceStr) : 0;
+                }
+                catch (FormatException)
+                {
+                    throw new ValidationException("price is not decimal.");
+                }
+                bool modeAnd = mode == "and";
+                items = Filter(items, price, manager, client, modeAnd);
                 try
                 {
                     return mapConfig.CreateMapper().Map<IEnumerable<SoldProductDTO>>(items);
                 }
                 catch
                 {
-
                     throw new DatabaseException();
                 }
             }
+        }
+
+        private IQueryable<SoldProduct> Filter(IQueryable<SoldProduct> items, decimal price, string manager, string client, bool modeAnd)
+        {
+            var query = items;
+            if (modeAnd)
+            {
+                if (price != 0)
+                {
+                    query = query.Where(item => item.Product.Price > price);
+                }
+                if (manager != "")
+                {
+                    query = query.Where(item => item.Manager.Name == manager);
+                }
+                if (client != "")
+                {
+                    query = query.Where(item => item.Client.Name == client);
+                }
+            }
+            else
+            {
+                query = query.Where(item => item.Product.Price > price || item.Manager.Name == manager || item.Client.Name == client);
+            }
+            return query;
         }
     }
 }

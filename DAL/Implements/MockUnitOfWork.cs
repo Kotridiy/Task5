@@ -12,10 +12,10 @@ namespace DAL.Implements
         private IGenericRepository<Product> _products;
         private IGenericRepository<Manager> _managers;
         private IGenericRepository<SoldProduct> _soldProducts;
-        private static bool _isClientCreated; 
-        private static bool _isProductCreated; 
-        private static bool _isManagerCreated; 
-        
+        private static bool _isClientCreated;
+        private static bool _isProductCreated;
+        private static bool _isManagerCreated;
+
         public IGenericRepository<Client> Clients
         {
             get

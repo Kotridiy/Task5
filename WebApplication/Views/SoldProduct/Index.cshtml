@@ -10,11 +10,33 @@
 
 <div>
     <form id="searchform">
-    <div>
-        <p>Price: </p>
-        <input type="text" name="price" />
-    </div>
-    <input type="submit" id="searchsubmit" value="Search" />
+        <div>
+            <p>
+                Price:
+                <input type="text" name="price" />
+            </p>
+        </div>
+        <div>
+            <p>
+                Manager name:
+                <input type="text" name="manager" />
+            </p>
+        </div>
+        <div>
+            <p>
+                Client name:
+                <input type="text" name="client" />
+            </p>
+        </div>
+        <div>
+            <p>
+                Or
+                <input type="radio" name="or_and" value="or" checked /> |
+                And
+                <input type="radio" name="or_and" value="and" />
+            </p>
+        </div>
+        <input type="submit" id="searchsubmit" value="Search" />
     </form>
 </div>
 
@@ -66,7 +88,7 @@
                 $("#searchform").on("submit", function (e) {
                     e.preventDefault();
                     let obj = this;
-                    $.post('@Url.Action("ProductSearch")?price=' + $("[name=price]").val(), $("#searchform").serialize(), function (data) {
+                    $.post('@Url.Action("ProductSearch")', $("#searchform").serialize(), function (data) {
                         $("#result").html(data);
                     });
                 });
